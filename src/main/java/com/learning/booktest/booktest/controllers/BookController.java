@@ -54,7 +54,6 @@ public class BookController {
     // DELETE
     @DeleteMapping(path = "/books/{isbn}")
     public ResponseEntity<Void> deleteBookById(@PathVariable final String isbn) {
-        bookService.deleteBookById(isbn);
         Optional<Book> optionalBook = bookService.findById(isbn);
         if (optionalBook.isEmpty())
             return ResponseEntity.notFound().build();
