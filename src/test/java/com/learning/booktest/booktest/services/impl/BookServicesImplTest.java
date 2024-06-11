@@ -3,6 +3,7 @@ package com.learning.booktest.booktest.services.impl;
 import com.learning.booktest.booktest.domain.Book;
 import com.learning.booktest.booktest.domain.BookEntity;
 import com.learning.booktest.booktest.repository.BookRepository;
+import com.learning.booktest.booktest.testingUtils.TestData;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -26,17 +27,17 @@ public class BookServicesImplTest {
 
     @Test
     public void testToSeeIfNullIsReturnedWhenTestingBookCreation() {
-        BookEntity bookEntity = TestData.testBookEntity();
+        BookEntity bookEntity = TestData.testBookEntityGood1();
         when(bookRepository.save(eq(bookEntity))).thenReturn(bookEntity);
-        Book book = TestData.testBook();
+        Book book = TestData.testBookGood1();
         Book result = underTest.save(book);
         assertEquals(book, result);
     }
 
     @Test
     public void testIfBookReturnedForTestBook() {
-        final Book book = TestData.testBook();
-        final BookEntity bookEntity = TestData.testBookEntity();
+        final Book book = TestData.testBookGood1();
+        final BookEntity bookEntity = TestData.testBookEntityGood1();
         when(bookRepository.findById(eq(book.getIsbn()))).thenReturn(Optional.of(bookEntity));
         Optional<Book> result = underTest.findById(book.getIsbn());
         assertEquals(Optional.of(book), result);

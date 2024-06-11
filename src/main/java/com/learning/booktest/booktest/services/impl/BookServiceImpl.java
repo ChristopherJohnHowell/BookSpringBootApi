@@ -2,6 +2,7 @@ package com.learning.booktest.booktest.services.impl;
 
 import com.learning.booktest.booktest.domain.Book;
 import com.learning.booktest.booktest.domain.BookEntity;
+import com.learning.booktest.booktest.domain.utils.DomainUtils;
 import com.learning.booktest.booktest.repository.BookRepository;
 import com.learning.booktest.booktest.services.BookService;
 import lombok.extern.slf4j.Slf4j;
@@ -25,31 +26,33 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public Book save(Book book) {
-        final BookEntity savedBookEntity = bookRepository.save(bookToBookEntity(book));
-        return bookEntityToBook(savedBookEntity);
+        try {
+            BookEntity result = bookRepository.save(DomainUtils.bookToBookEntity(book));
+            return DomainUtils.bookEntityToBook(result);
+        } catch (Exception err) {
+            System.out.println("Service Save Error: " + err);
+        }
+
+        return null;
     }
 
     @Override
     public Optional<Book> update(Book book) {
-
-        if(ifBookExists(book.getIsbn())){
-            BookEntity updated = bookRepository.save(bookToBookEntity(book));
-            return Optional.of(bookEntityToBook(updated));
-        }
-
-        return Optional.empty();
+        return ifBookExists(book.getIsbn()) ?
+                Optional.of(DomainUtils.bookEntityToBook(bookRepository.save(DomainUtils.bookToBookEntity(book))))
+                : Optional.empty();
     }
 
     @Override
     public Optional<Book> findById(String isbn) {
         Optional<BookEntity> foundBook = bookRepository.findById(isbn);
-        return foundBook.map(this::bookEntityToBook);
+        return foundBook.map(DomainUtils::bookEntityToBook);
     }
 
     @Override
     public Optional<List<Book>> findAll() {
         List<BookEntity> allBookEntities = bookRepository.findAll();
-        return allBookEntities.isEmpty() ? Optional.empty() : Optional.of(allBookEntities.stream().map(this::bookEntityToBook).toList());
+        return allBookEntities.isEmpty() ? Optional.empty() : Optional.of(allBookEntities.stream().map(DomainUtils::bookEntityToBook).toList());
     }
 
     @Override
@@ -66,20 +69,20 @@ public class BookServiceImpl implements BookService {
         }
     }
 
-    private BookEntity bookToBookEntity(Book book) {
-        return BookEntity.builder()
-                .isbn(book.getIsbn())
-                .author(book.getAuthor())
-                .title(book.getTitle())
-                .build();
-    }
-
-    private Book bookEntityToBook(BookEntity bookEntity) {
-        return Book.builder()
-                .isbn(bookEntity.getIsbn())
-                .author(bookEntity.getAuthor())
-                .title(bookEntity.getTitle())
-                .build();
-    }
+//    private BookEntity bookToBookEntity(Book book) {
+//        return BookEntity.builder()
+//                .isbn(book.getIsbn())
+//                .author(book.getAuthor())
+//                .title(book.getTitle())
+//                .build();
+//    }
+//
+//    private Book bookEntityToBook(BookEntity bookEntity) {
+//        return Book.builder()
+//                .isbn(bookEntity.getIsbn())
+//                .author(bookEntity.getAuthor())
+//                .title(bookEntity.getTitle())
+//                .build();
+//    }
 
 }

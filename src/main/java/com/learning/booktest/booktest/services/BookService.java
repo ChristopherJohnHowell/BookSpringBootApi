@@ -10,19 +10,19 @@ public interface BookService {
     // Create
     Book save(Book book);
 
-    // Update
-    Optional<Book> update(Book book);
-
     // Read
     Optional<Book> findById(String isbn);
 
+    // Read
     Optional<List<Book>> findAll();
 
-    // ifBookExists
-    boolean ifBookExists(String isbn);
+    // Update
+    Optional<Book> update(Book book);
 
     // Delete
     void deleteBookById(String isbn);
 
+    // ifBookExists
+    boolean ifBookExists(String isbn);
 
 }
