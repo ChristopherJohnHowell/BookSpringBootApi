@@ -7,8 +7,11 @@ import java.util.Optional;
 
 public interface BookService {
 
-    // Create / Update
+    // Create
     Book save(Book book);
+
+    // Update
+    Optional<Book> update(Book book);
 
     // Read
     Optional<Book> findById(String isbn);

@@ -23,8 +23,8 @@ public class BookController {
     }
 
     // GET ALL
-    @GetMapping(path = "/books")
-    public ResponseEntity<List<BookDTO>> retrieveBooks() {
+    @GetMapping(path = "api/books")
+    public ResponseEntity<List<BookDTO>> getBooks() {
         final Optional<List<Book>> foundBooks = bookService.findAll();
         Optional<List<BookDTO>> foundBookDTOs = foundBooks.map(cur -> cur.stream().map(this::bookToBookDto).toList());
         return foundBookDTOs.map(list -> new ResponseEntity<>(list, HttpStatus.OK))
@@ -32,16 +32,16 @@ public class BookController {
     }
 
     // GET ONE
-    @GetMapping(path = "/books/{isbn}")
-    public ResponseEntity<BookDTO> retrieveBook(@PathVariable final String isbn) {
+    @GetMapping(path = "api/books/{isbn}")
+    public ResponseEntity<BookDTO> getBook(@PathVariable final String isbn) {
         final Optional<Book> foundBook = bookService.findById(isbn);
         Optional<BookDTO> foundBookDTO = foundBook.map(this::bookToBookDto);
         return foundBookDTO.map(bookDTO -> new ResponseEntity<>(bookDTO, HttpStatus.OK)).orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
     // CREATE ONE
-    @PutMapping(path = "/books/{isbn}")
-    public ResponseEntity<BookDTO> createUpdateBook(@PathVariable String isbn, @RequestBody BookDTO bookDTO) {
+    @PostMapping(path = "api/books/{isbn}")
+    public ResponseEntity<BookDTO> createBook(@PathVariable String isbn, @RequestBody BookDTO bookDTO) {
         bookDTO.setIsbn(isbn); // PathVariable ISBN set to match RequestBody ISBN.
         Book book = bookDtoToBook(bookDTO);
         boolean ifBookExists = bookService.ifBookExists(book.getIsbn());
@@ -51,8 +51,21 @@ public class BookController {
                 new ResponseEntity<>(resultBookDTO, HttpStatus.OK) : new ResponseEntity<>(resultBookDTO, HttpStatus.CREATED);
     }
 
+    // UPDATE ONE
+    @PutMapping(path = "api/books/{isbn}")
+    public ResponseEntity<BookDTO> updateBook(@PathVariable String isbn, @RequestBody BookDTO bookDTO) {
+        bookDTO.setIsbn(isbn); // PathVariable ISBN set to match RequestBody ISBN.
+        Book book = bookDtoToBook(bookDTO);
+        Optional<Book> updatedBook = bookService.update(book);
+        if (updatedBook.isEmpty())
+            return ResponseEntity.notFound().build();
+
+        BookDTO resultBookDTO = bookToBookDto(updatedBook.get());
+        return new ResponseEntity<>(resultBookDTO, HttpStatus.OK);
+    }
+
     // DELETE ONE
-    @DeleteMapping(path = "/books/{isbn}")
+    @DeleteMapping(path = "api/books/{isbn}")
     public ResponseEntity<Void> deleteBookById(@PathVariable final String isbn) {
         boolean bookExists = bookService.ifBookExists(isbn);
         if (!bookExists)

@@ -18,7 +18,6 @@ public class BookServiceImpl implements BookService {
 
     private final BookRepository bookRepository;
 
-    // Dependency Injection
     @Autowired
     public BookServiceImpl(BookRepository bookRepository) {
         this.bookRepository = bookRepository;
@@ -28,6 +27,17 @@ public class BookServiceImpl implements BookService {
     public Book save(Book book) {
         final BookEntity savedBookEntity = bookRepository.save(bookToBookEntity(book));
         return bookEntityToBook(savedBookEntity);
+    }
+
+    @Override
+    public Optional<Book> update(Book book) {
+
+        if(ifBookExists(book.getIsbn())){
+            BookEntity updated = bookRepository.save(bookToBookEntity(book));
+            return Optional.of(bookEntityToBook(updated));
+        }
+
+        return Optional.empty();
     }
 
     @Override

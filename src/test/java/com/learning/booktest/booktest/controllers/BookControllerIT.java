@@ -32,13 +32,10 @@ public class BookControllerIT {
 
     @Test
     public void testIfCreateBookReturnsHttpStatus201() throws Exception {
-        //Book book = TestData.testBook();
         BookDTO bookDTO = TestData.testBookDto();
         String jsonBookDto = new ObjectMapper().writeValueAsString(bookDTO);
-        //String jsonBook = new ObjectMapper().writeValueAsString(book);
-        // check if there is a book in the db!
 
-        mockMvc.perform(MockMvcRequestBuilders.put("/books/" + bookDTO.getIsbn()).content(jsonBookDto).contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(MockMvcRequestBuilders.put("api/books/" + bookDTO.getIsbn()).content(jsonBookDto).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isCreated())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.isbn").value(bookDTO.getIsbn()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.title").value(bookDTO.getTitle()))
@@ -49,7 +46,7 @@ public class BookControllerIT {
     public void testThatRetrievingBookReturnsHttpStatusFound() throws Exception {
         final Book book = TestData.testBook();
         bookService.save(book);
-        mockMvc.perform(MockMvcRequestBuilders.get("/books/" + book.getIsbn()))
+        mockMvc.perform(MockMvcRequestBuilders.get("api/books/" + book.getIsbn()))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.isbn").value(book.getIsbn()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.author").value(book.getAuthor()))
@@ -59,7 +56,7 @@ public class BookControllerIT {
     @Test
     public void testThatDeleteBookReturnsHttpStatus204() throws Exception {
         Book book = TestData.testBook();
-        mockMvc.perform(MockMvcRequestBuilders.delete("/books/" + book.getIsbn()))
+        mockMvc.perform(MockMvcRequestBuilders.delete("api/books/" + book.getIsbn()))
                 .andExpect(MockMvcResultMatchers.status().isNoContent());
     }
 
