@@ -16,7 +16,7 @@ public interface BookService {
     Optional<List<Book>> findAll();
 
     // ifBookExists
-    boolean ifBookExists(Book book);
+    boolean ifBookExists(String isbn);
 
     // Delete
     void deleteBookById(String isbn);

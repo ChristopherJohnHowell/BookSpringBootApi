@@ -14,7 +14,7 @@ import java.util.Optional;
 @RestController
 public class BookController {
 
-    // AutoWired
+    // For AutoWired.
     private final BookService bookService;
 
     @Autowired
@@ -44,18 +44,18 @@ public class BookController {
     public ResponseEntity<BookDTO> createUpdateBook(@PathVariable String isbn, @RequestBody BookDTO bookDTO) {
         bookDTO.setIsbn(isbn); // PathVariable ISBN set to match RequestBody ISBN.
         Book book = bookDtoToBook(bookDTO);
-        boolean ifBookExists = bookService.ifBookExists(book);
+        boolean ifBookExists = bookService.ifBookExists(book.getIsbn());
         Book resultBook = bookService.save(book);
         BookDTO resultBookDTO = bookToBookDto(resultBook);
         return ifBookExists ?
                 new ResponseEntity<>(resultBookDTO, HttpStatus.OK) : new ResponseEntity<>(resultBookDTO, HttpStatus.CREATED);
     }
 
-    // DELETE
+    // DELETE ONE
     @DeleteMapping(path = "/books/{isbn}")
     public ResponseEntity<Void> deleteBookById(@PathVariable final String isbn) {
-        Optional<Book> optionalBook = bookService.findById(isbn);
-        if (optionalBook.isEmpty())
+        boolean bookExists = bookService.ifBookExists(isbn);
+        if (!bookExists)
             return ResponseEntity.notFound().build();
         bookService.deleteBookById(isbn);
         return ResponseEntity.noContent().build();

@@ -58,8 +58,8 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public boolean ifBookExists(Book book) {
-        return findById(book.getIsbn()).isPresent();
+    public boolean ifBookExists(String isbn) {
+        return findById(isbn).isPresent();
     }
 
     @Override
