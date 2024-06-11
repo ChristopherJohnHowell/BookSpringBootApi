@@ -31,16 +31,20 @@ public class BookServiceImpl implements BookService {
             return DomainUtils.bookEntityToBook(result);
         } catch (Exception err) {
             System.out.println("Service Save Error: " + err);
+            return null;
         }
-
-        return null;
     }
 
     @Override
     public Optional<Book> update(Book book) {
-        return ifBookExists(book.getIsbn()) ?
-                Optional.of(DomainUtils.bookEntityToBook(bookRepository.save(DomainUtils.bookToBookEntity(book))))
-                : Optional.empty();
+        try {
+            return bookRepository.findById(book.getIsbn()).isPresent() ?
+                    Optional.of(DomainUtils.bookEntityToBook(bookRepository.save(DomainUtils.bookToBookEntity(book))))
+                    : Optional.empty();
+        } catch (Exception err) {
+            System.out.println("Service Update Error: " + err);
+            return Optional.empty();
+        }
     }
 
     @Override
@@ -55,10 +59,11 @@ public class BookServiceImpl implements BookService {
         return allBookEntities.isEmpty() ? Optional.empty() : Optional.of(allBookEntities.stream().map(DomainUtils::bookEntityToBook).toList());
     }
 
-    @Override
-    public boolean ifBookExists(String isbn) {
-        return findById(isbn).isPresent();
-    }
+
+//    @Override
+//    public boolean ifBookExists(String isbn) {
+//        return findById(isbn).isPresent();
+//    }
 
     @Override
     public void deleteBookById(String isbn) {

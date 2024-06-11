@@ -23,6 +23,6 @@ public interface BookService {
     void deleteBookById(String isbn);
 
     // ifBookExists
-    boolean ifBookExists(String isbn);
+    //boolean ifBookExists(String isbn);
 
 }

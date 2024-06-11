@@ -22,10 +22,34 @@ public class TestData {
         return book;
     }
 
+    public static Book testBookBad2MissingData() {
+        Book book = new Book();
+        book.setIsbn("01234567");
+        //book.setAuthor("Johnny Silver");
+        book.setTitle("The Seven Seas");
+        return book;
+    }
+
+    public static Book testBookBad3MissingIsbn(){
+        Book book = new Book();
+        //book.setIsbn("01234567");
+        book.setAuthor("Johnny Silver");
+        book.setTitle("The Seven Seas");
+        return book;
+    }
+
     public static BookEntity testBookEntityGood1() {
         BookEntity bookEntity = new BookEntity();
         bookEntity.setIsbn("01234567");
         bookEntity.setAuthor("Johnny Silver");
+        bookEntity.setTitle("The Seven Seas");
+        return bookEntity;
+    }
+
+    public static BookEntity testBookEntityBad2() {
+        BookEntity bookEntity = new BookEntity();
+        bookEntity.setIsbn("01234567");
+        //bookEntity.setAuthor("Johnny Silver");
         bookEntity.setTitle("The Seven Seas");
         return bookEntity;
     }
