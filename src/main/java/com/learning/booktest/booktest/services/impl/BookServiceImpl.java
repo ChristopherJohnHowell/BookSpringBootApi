@@ -16,8 +16,7 @@ import java.util.Optional;
 @Slf4j
 public class BookServiceImpl implements BookService {
 
-    // Constructor dependency injection
-    private BookRepository bookRepository;
+    private final BookRepository bookRepository;
 
     // Dependency Injection
     @Autowired
@@ -25,26 +24,12 @@ public class BookServiceImpl implements BookService {
         this.bookRepository = bookRepository;
     }
 
-    // Business Logic:
-
-    /**
-     * SAVE BOOK
-     *
-     * @param book
-     * @return
-     */
     @Override
     public Book save(Book book) {
         final BookEntity savedBookEntity = bookRepository.save(bookToBookEntity(book));
         return bookEntityToBook(savedBookEntity);
     }
 
-    /**
-     * READ BOOK (BY ID)
-     *
-     * @param isbn
-     * @return
-     */
     @Override
     public Optional<Book> findById(String isbn) {
         Optional<BookEntity> foundBook = bookRepository.findById(isbn);
@@ -86,6 +71,5 @@ public class BookServiceImpl implements BookService {
                 .title(bookEntity.getTitle())
                 .build();
     }
-
 
 }
