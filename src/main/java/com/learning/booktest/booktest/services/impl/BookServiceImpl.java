@@ -59,12 +59,6 @@ public class BookServiceImpl implements BookService {
         return allBookEntities.isEmpty() ? Optional.empty() : Optional.of(allBookEntities.stream().map(DomainUtils::bookEntityToBook).toList());
     }
 
-
-//    @Override
-//    public boolean ifBookExists(String isbn) {
-//        return findById(isbn).isPresent();
-//    }
-
     @Override
     public void deleteBookById(String isbn) {
         try {
@@ -73,21 +67,5 @@ public class BookServiceImpl implements BookService {
             log.debug("Attempted to delete non-existing book", e);
         }
     }
-
-//    private BookEntity bookToBookEntity(Book book) {
-//        return BookEntity.builder()
-//                .isbn(book.getIsbn())
-//                .author(book.getAuthor())
-//                .title(book.getTitle())
-//                .build();
-//    }
-//
-//    private Book bookEntityToBook(BookEntity bookEntity) {
-//        return Book.builder()
-//                .isbn(bookEntity.getIsbn())
-//                .author(bookEntity.getAuthor())
-//                .title(bookEntity.getTitle())
-//                .build();
-//    }
 
 }

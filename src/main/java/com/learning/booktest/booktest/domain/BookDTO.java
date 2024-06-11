@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 public class BookDTO {
 
     @Id
+    @NotEmpty(message = "ISBN is required")
     private String isbn;
 
     @NotEmpty(message = "Author name is required")

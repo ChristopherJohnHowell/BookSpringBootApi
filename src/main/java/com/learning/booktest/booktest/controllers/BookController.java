@@ -83,20 +83,4 @@ public class BookController {
         return ResponseEntity.noContent().build();
     }
 
-//    private Book bookDtoToBook(BookDTO bookDTO) {
-//        return Book.builder()
-//                .isbn(bookDTO.getIsbn())
-//                .title(bookDTO.getTitle())
-//                .author(bookDTO.getAuthor())
-//                .build();
-//    }
-//
-//    private BookDTO bookToBookDto(Book book) {
-//        return BookDTO.builder()
-//                .isbn(book.getIsbn())
-//                .title(book.getTitle())
-//                .author(book.getAuthor())
-//                .build();
-//    }
-
 }
