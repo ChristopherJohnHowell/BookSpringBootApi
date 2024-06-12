@@ -39,6 +39,8 @@ public class BookControllerIT {
     @Autowired
     BookRepository bookRepository;
 
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
     @BeforeEach
     void setUp(){
         bookRepository.deleteAll();
@@ -50,7 +52,7 @@ public class BookControllerIT {
     @Test
     public void testIfCreateWithGoodDataReturnsHttpStatus201() throws Exception {
         BookDTO bookDTO = TestData.testBookDtoGood1();
-        String jsonBookDto = new ObjectMapper().writeValueAsString(bookDTO);
+        String jsonBookDto = objectMapper.writeValueAsString(bookDTO);
         mockMvc.perform(MockMvcRequestBuilders.post("/api/book/" + bookDTO.getIsbn()).contentType(MediaType.APPLICATION_JSON).content(jsonBookDto))
                 .andExpect(MockMvcResultMatchers.status().isCreated())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.isbn").value(bookDTO.getIsbn()))
@@ -61,7 +63,7 @@ public class BookControllerIT {
     @Test
     public void testIfCreateWithBadDataReturnsHttpStatus400() throws Exception {
         BookDTO badBookDTO = TestData.testBookDTOBadMissingData1();
-        String jsonBookDto = new ObjectMapper().writeValueAsString(badBookDTO);
+        String jsonBookDto = objectMapper.writeValueAsString(badBookDTO);
         mockMvc.perform(MockMvcRequestBuilders.post("/api/book/" + badBookDTO.getIsbn()).contentType(MediaType.APPLICATION_JSON).content(jsonBookDto))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest());
     }
@@ -71,7 +73,7 @@ public class BookControllerIT {
         BookDTO testBookDTO = TestData.testBookDtoGood1();
         Book book = DomainUtils.bookDtoToBook(testBookDTO);
         bookService.save(book);
-        String bookStr = new ObjectMapper().writeValueAsString(testBookDTO);
+        String bookStr = objectMapper.writeValueAsString(testBookDTO);
         mockMvc.perform(MockMvcRequestBuilders.put("/api/book/" + testBookDTO.getIsbn()).contentType(MediaType.APPLICATION_JSON).content(bookStr))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.isbn").value(testBookDTO.getIsbn()))
@@ -82,7 +84,7 @@ public class BookControllerIT {
     @Test
     public void testIfUpdateWithBadDataReturnsHttpStatus400() throws Exception {
         BookDTO testBookDTO = TestData.testBookDTOBadMissingData1();
-        String bookStr = new ObjectMapper().writeValueAsString(testBookDTO);
+        String bookStr = objectMapper.writeValueAsString(testBookDTO);
         mockMvc.perform(MockMvcRequestBuilders.put("/api/book/" + testBookDTO.getIsbn()).contentType(MediaType.APPLICATION_JSON).content(bookStr))
                 .andExpect(MockMvcResultMatchers.status().isNotFound());
     }

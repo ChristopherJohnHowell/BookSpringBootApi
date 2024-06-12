@@ -10,17 +10,15 @@ import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 @RestController
+@RequestMapping("/api/book")
 public class BookController {
 
-    // For AutoWired.
     private final BookService bookService;
 
     @Autowired
@@ -28,59 +26,114 @@ public class BookController {
         this.bookService = bookService;
     }
 
-    // CREATE ONE
-    @PostMapping(path = "/api/book/{isbn}")
+    /**
+     * Create a new book.
+     *
+     * @param isbn          The ISBN of the book.
+     * @param bookDTO       The book data transfer object.
+     * @param bindingResult The binding result for validation errors.
+     * @return A ResponseEntity with the created book or error messages.
+     */
+    @PostMapping(path = "/{isbn}")
     public ResponseEntity<?> createBook(@PathVariable String isbn, @Valid @RequestBody BookDTO bookDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            List<ObjectError> allErrors = bindingResult.getAllErrors();
-            Stream<String> errMessages = allErrors.stream().map(DefaultMessageSourceResolvable::getDefaultMessage);
-            return new ResponseEntity<>(errMessages, HttpStatus.BAD_REQUEST);
+            List<String> errorMessages = bindingResult.getAllErrors()
+                    .stream()
+                    .map(DefaultMessageSourceResolvable::getDefaultMessage)
+                    .toList();
+            return new ResponseEntity<>(errorMessages, HttpStatus.BAD_REQUEST);
         }
 
         bookDTO.setIsbn(isbn); // PathVariable ISBN set to match RequestBody ISBN.
         Book book = DomainUtils.bookDtoToBook(bookDTO);
-        Book resultBook = bookService.save(book);
-        BookDTO resultBookDTO = DomainUtils.bookToBookDto(resultBook);
+        Book savedBook = bookService.save(book);
+
+        if (savedBook == null) {
+            return new ResponseEntity<>("Failed to save book.", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        BookDTO resultBookDTO = DomainUtils.bookToBookDto(savedBook);
+
         return new ResponseEntity<>(resultBookDTO, HttpStatus.CREATED);
     }
 
-    // GET ALL
-    @GetMapping(path = "/api/book")
+    /**
+     * Get all books.
+     *
+     * @return A ResponseEntity with a list of all books or a no content status.
+     */
+    @GetMapping
     public ResponseEntity<List<BookDTO>> getBooks() {
         final Optional<List<Book>> foundBooks = bookService.findAll();
-        Optional<List<BookDTO>> foundBookDTOs = foundBooks.map(cur -> cur.stream().map(DomainUtils::bookToBookDto).toList());
-        return foundBookDTOs.map(list -> new ResponseEntity<>(list, HttpStatus.OK))
-                .orElse(new ResponseEntity<>(HttpStatus.NO_CONTENT));
+
+        if (foundBooks.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+
+        List<BookDTO> bookDTOs = foundBooks.get()
+                .stream()
+                .map(DomainUtils::bookToBookDto)
+                .toList();
+
+        return new ResponseEntity<>(bookDTOs, HttpStatus.OK);
     }
 
-    // GET ONE
-    @GetMapping(path = "/api/book/{isbn}")
+    /**
+     * Get a book by its ISBN.
+     *
+     * @param isbn The ISBN of the book.
+     * @return A ResponseEntity with the found book or a not found status.
+     */
+    @GetMapping(path = "/{isbn}")
     public ResponseEntity<BookDTO> getBook(@PathVariable final String isbn) {
         final Optional<Book> foundBook = bookService.findById(isbn);
-        Optional<BookDTO> foundBookDTO = foundBook.map(DomainUtils::bookToBookDto);
-        return foundBookDTO.map(bookDTO -> new ResponseEntity<>(bookDTO, HttpStatus.OK)).orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+
+        if (foundBook.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        BookDTO foundBookDTO = DomainUtils.bookToBookDto(foundBook.get());
+
+        return new ResponseEntity<>(foundBookDTO, HttpStatus.OK);
     }
 
-    // UPDATE ONE
-    @PutMapping(path = "/api/book/{isbn}")
+    /**
+     * Update an existing book.
+     *
+     * @param isbn    The ISBN of the book.
+     * @param bookDTO The book data transfer object.
+     * @return A ResponseEntity with the updated book or a not found status.
+     */
+    @PutMapping(path = "/{isbn}")
     public ResponseEntity<BookDTO> updateBook(@PathVariable String isbn, @RequestBody BookDTO bookDTO) {
         bookDTO.setIsbn(isbn); // PathVariable ISBN set to match RequestBody ISBN.
         Book book = DomainUtils.bookDtoToBook(bookDTO);
         Optional<Book> updatedBook = bookService.update(book);
-        if (updatedBook.isEmpty())
-            return ResponseEntity.notFound().build();
+
+        if (updatedBook.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
 
         BookDTO resultBookDTO = DomainUtils.bookToBookDto(updatedBook.get());
+
         return new ResponseEntity<>(resultBookDTO, HttpStatus.OK);
     }
 
-    // DELETE ONE
-    @DeleteMapping(path = "/api/book/{isbn}")
+    /**
+     * Delete a book by its ISBN.
+     *
+     * @param isbn The ISBN of the book.
+     * @return A ResponseEntity with no content or a not found status.
+     */
+    @DeleteMapping(path = "/{isbn}")
     public ResponseEntity<Void> deleteBookById(@PathVariable final String isbn) {
-        if (bookService.findById(isbn).isEmpty())
-            return ResponseEntity.notFound().build();
+        if (bookService.findById(isbn).isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
         bookService.deleteBookById(isbn);
-        return ResponseEntity.noContent().build();
+
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
 }
