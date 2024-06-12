@@ -14,6 +14,14 @@ public class TestData {
         return book;
     }
 
+    public static Book testBookGood2() {
+        Book book = new Book();
+        book.setIsbn("01234599");
+        book.setAuthor("Max Johnson");
+        book.setTitle("Mathematics 101");
+        return book;
+    }
+
     public static Book testBookBad1NotInDB() {
         Book book = new Book();
         book.setIsbn("987654321notInDb");
