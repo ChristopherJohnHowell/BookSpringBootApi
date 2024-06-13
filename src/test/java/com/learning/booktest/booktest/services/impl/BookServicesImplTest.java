@@ -43,6 +43,7 @@ public class BookServicesImplTest {
         BookEntity bookEntity = TestData.testBookEntityBad2();
         when(bookRepository.save(bookEntity)).thenReturn(null);
         Book book = DomainUtils.bookEntityToBook(bookEntity);
+        System.out.println("Book:" + book);
         Book result = underTest.save(book);
         assertThat(result).isNull();
     }
