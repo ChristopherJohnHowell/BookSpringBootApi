@@ -19,7 +19,7 @@ public class BookServiceImpl implements BookService {
 
     private final BookRepository bookRepository;
 
-    @Autowired
+    // Don't need @Autowired for Constructor Injection!
     public BookServiceImpl(BookRepository bookRepository) {
         this.bookRepository = bookRepository;
     }
